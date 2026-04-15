@@ -1,0 +1,291 @@
+---
+---
+
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nivel 30 - Transición de Nivel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Poppins:wght@600&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+    <div id="gameSection">
+        <h1>NIVEL 30<br />Cómetelo todo para subir de nivel</h1>
+        <div id="gameContainer">
+            <canvas id="pacmanCanvas" width="450" height="330"></canvas>
+        </div>
+        <div class="controls">Usa las FLECHAS de tu teclado para moverte</div>
+        <div id="warning"></div>
+    </div>
+
+    <div id="giftReveal">
+        <h2>¡LEVEL UP!<br />BIENVENIDO AL NIVEL 31</h2>
+        <p>Has superado la fase de los 30 con éxito.</p>
+        <p>Prepara una <span class="highlight">cerveza fría</span>, ponte tu chupa de <span class="highlight">rock</span> y olvídate de los planos de caminos por hoy.</p>
+        <div style="background: #222; padding: 20px; border-radius: 10px; margin-top: 20px; border: 1px dashed #555;">
+            <h3 style="color: #fff; margin:0 0 10px 0; font-size: 1.2rem;">🎟️ ENTRADAS PARA EL MONÓLOGO 🎟️</h3>
+            <p style="font-size: 1rem; margin:0;">Nos vamos a partir de risa.</p>
+        </div>
+    </div>
+
+</body>
+</html>
+
+<style is:global>
+    body {
+        margin: 0;
+        background-color: #000;
+        color: #fff;
+        font-family: 'Press Start 2P', cursive;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        overflow: hidden;
+    }
+
+    h1 {
+        font-size: 1.2rem;
+        color: #ffde00;
+        margin-bottom: 20px;
+        text-align: center;
+        line-height: 1.5;
+    }
+
+    #gameContainer {
+        border: 4px solid #1919A6;
+        border-radius: 10px;
+        padding: 10px;
+        background: #000;
+        position: relative;
+    }
+
+    canvas {
+        background-color: #000;
+        display: block;
+    }
+
+    .controls {
+        margin-top: 20px;
+        font-size: 0.7rem;
+        color: #888;
+        text-align: center;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* ESTILOS DEL REGALO (OCULTO AL INICIO) */
+    #giftReveal {
+        display: none;
+        text-align: center;
+        animation: popIn 1s ease forwards;
+        background: #111;
+        padding: 40px;
+        border-radius: 20px;
+        border: 2px solid #ffde00;
+        max-width: 500px;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    #giftReveal h2 {
+        color: #ffde00;
+        font-size: 2rem;
+        margin-bottom: 20px;
+        font-family: 'Press Start 2P', cursive;
+        line-height: 1.4;
+    }
+
+    #giftReveal p {
+        font-size: 1.2rem;
+        line-height: 1.6;
+        color: #ccc;
+    }
+
+    .highlight { color: #ffde00; font-weight: bold; }
+
+    @keyframes popIn {
+        0% { transform: scale(0.5); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    #warning {
+        color: #ff0000;
+        font-size: 0.8rem;
+        margin-top: 10px;
+        min-height: 1em;
+    }
+</style>
+
+<script>
+    const canvas = document.getElementById('pacmanCanvas') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d')!;
+    const TILE_SIZE = 30;
+
+    // 1 = Pared, 0 = Punto, 2 = Vacío
+    const map = [
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,1,0,0,0,0,0,0,0,1],
+        [1,0,1,1,1,0,1,0,1,1,1,1,1,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,1,1,1,0,1,1,1,0,1,1,1,0,1],
+        [1,0,0,0,1,0,0,0,0,0,1,0,0,0,1],
+        [1,1,1,0,1,0,1,1,1,0,1,0,1,1,1],
+        [1,0,0,0,0,0,1,0,0,0,0,0,0,0,1],
+        [1,0,1,1,1,0,1,0,1,1,1,1,1,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+    ];
+
+    let totalDots = 0;
+    for(let r=0; r<map.length; r++) {
+        for(let c=0; c<map[r].length; c++) {
+            if(map[r][c] === 0) totalDots++;
+        }
+    }
+
+    let pacman = { r: 1, c: 1, nextDr: 0, nextDc: 0, dr: 0, dc: 0 };
+
+    let ghosts = [
+        { r: 5, c: 7, color: '#FF0000' }, // Rojo (Blinky)
+        { r: 5, c: 8, color: '#FFB8FF' }  // Rosa (Pinky)
+    ];
+
+    let frameCount = 0;
+
+    function drawMap() {
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        for(let r=0; r<map.length; r++) {
+            for(let c=0; c<map[r].length; c++) {
+                if(map[r][c] === 1) {
+                    ctx.fillStyle = '#1919A6';
+                    ctx.fillRect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                } else if(map[r][c] === 0) {
+                    ctx.fillStyle = '#FFB8AE';
+                    ctx.beginPath();
+                    ctx.arc(c * TILE_SIZE + TILE_SIZE/2, r * TILE_SIZE + TILE_SIZE/2, 4, 0, Math.PI*2);
+                    ctx.fill();
+                }
+            }
+        }
+    }
+
+    function drawPacman() {
+        const x = pacman.c * TILE_SIZE + TILE_SIZE/2;
+        const y = pacman.r * TILE_SIZE + TILE_SIZE/2;
+        const mouthAngle = 0.2 + Math.abs(Math.sin(frameCount * 0.2)) * 0.3;
+
+        let rotation = 0;
+        if(pacman.dr === 1) rotation = Math.PI/2;
+        if(pacman.dr === -1) rotation = -Math.PI/2;
+        if(pacman.dc === -1) rotation = Math.PI;
+
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(rotation);
+        ctx.fillStyle = '#FFFF00';
+        ctx.beginPath();
+        ctx.arc(0, 0, TILE_SIZE/2 - 2, mouthAngle * Math.PI, (2 - mouthAngle) * Math.PI);
+        ctx.lineTo(0, 0);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    function drawGhosts() {
+        ghosts.forEach(g => {
+            const x = g.c * TILE_SIZE;
+            const y = g.r * TILE_SIZE;
+
+            ctx.fillStyle = g.color;
+            ctx.beginPath();
+            ctx.arc(x + TILE_SIZE/2, y + TILE_SIZE/2, TILE_SIZE/2 - 2, Math.PI, 0);
+            ctx.lineTo(x + TILE_SIZE - 2, y + TILE_SIZE - 2);
+            ctx.lineTo(x + 2, y + TILE_SIZE - 2);
+            ctx.fill();
+
+            // Ojos
+            ctx.fillStyle = '#FFF';
+            ctx.beginPath();
+            ctx.arc(x + 10, y + 12, 4, 0, Math.PI*2);
+            ctx.arc(x + 20, y + 12, 4, 0, Math.PI*2);
+            ctx.fill();
+            ctx.fillStyle = '#00F';
+            ctx.beginPath();
+            ctx.arc(x + 10, y + 12, 2, 0, Math.PI*2);
+            ctx.arc(x + 20, y + 12, 2, 0, Math.PI*2);
+            ctx.fill();
+        });
+    }
+
+    function update() {
+        frameCount++;
+
+        // Mover Pacman
+        if (frameCount % 8 === 0) {
+            if (map[pacman.r + pacman.nextDr][pacman.c + pacman.nextDc] !== 1) {
+                pacman.dr = pacman.nextDr; pacman.dc = pacman.nextDc;
+            }
+            if (map[pacman.r + pacman.dr][pacman.c + pacman.dc] !== 1) {
+                pacman.r += pacman.dr; pacman.c += pacman.dc;
+            }
+
+            if (map[pacman.r][pacman.c] === 0) {
+                map[pacman.r][pacman.c] = 2;
+                totalDots--;
+                if(totalDots === 0) {
+                    winGame();
+                    return;
+                }
+            }
+        }
+
+        // Mover Fantasmas (IA Básica Aleatoria)
+        if (frameCount % 12 === 0) {
+            ghosts.forEach(g => {
+                let moves = [
+                    {r: -1, c: 0}, {r: 1, c: 0}, {r: 0, c: -1}, {r: 0, c: 1}
+                ].filter(m => map[g.r + m.r][g.c + m.c] !== 1);
+
+                if(moves.length > 0) {
+                    let move = moves[Math.floor(Math.random() * moves.length)];
+                    g.r += move.r; g.c += move.c;
+                }
+            });
+        }
+
+        // Colisiones
+        ghosts.forEach(g => {
+            if (g.r === pacman.r && g.c === pacman.c) {
+                pacman.r = 1; pacman.c = 1; // Reset posición
+                pacman.dr = 0; pacman.dc = 0;
+                pacman.nextDr = 0; pacman.nextDc = 0;
+                document.getElementById('warning')!.innerText = "¡Un fantasma te ha pillado! Vuelves al inicio.";
+                setTimeout(() => document.getElementById('warning')!.innerText = "", 2000);
+            }
+        });
+
+        drawMap();
+        drawPacman();
+        drawGhosts();
+        requestAnimationFrame(update);
+    }
+
+    function winGame() {
+        document.getElementById('gameSection')!.style.display = 'none';
+        document.getElementById('giftReveal')!.style.display = 'block';
+    }
+
+    window.addEventListener('keydown', (e: KeyboardEvent) => {
+        if(e.key === 'ArrowUp') { pacman.nextDr = -1; pacman.nextDc = 0; }
+        if(e.key === 'ArrowDown') { pacman.nextDr = 1; pacman.nextDc = 0; }
+        if(e.key === 'ArrowLeft') { pacman.nextDr = 0; pacman.nextDc = -1; }
+        if(e.key === 'ArrowRight') { pacman.nextDr = 0; pacman.nextDc = 1; }
+        if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+            e.preventDefault();
+        }
+    });
+
+    requestAnimationFrame(update);
+</script>
