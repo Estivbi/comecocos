@@ -682,6 +682,19 @@
         document.getElementById('mockAppSection')!.style.display = 'none';
         document.getElementById('warning')!.innerText = '';
 
+        // Restaurar estado interno de la UI de entradas
+        const hiddenTickets = document.getElementById('hiddenTickets');
+        const btnRevealQR = document.getElementById('btnRevealQR') as HTMLButtonElement | null;
+
+        if (hiddenTickets) {
+            hiddenTickets.hidden = true;
+            hiddenTickets.querySelectorAll('[tabindex]').forEach((element) => {
+                element.removeAttribute('tabindex');
+            });
+        }
+
+        btnRevealQR?.setAttribute('aria-expanded', 'false');
+
         // Reiniciar bucle si no estaba corriendo
         if (!gameRunning) {
             gameRunning = true;
@@ -763,13 +776,11 @@
     });
 
     // Botones "Volver a jugar"
-    document.getElementById('btnVolverJugar')!.addEventListener('click', () => {
+    function handleReplay() {
         try { localStorage.removeItem(LEVEL_STORAGE_KEY); } catch { /* localStorage unavailable */ }
         resetGame();
-    });
+    }
 
-    document.getElementById('btnVolverJugar2')!.addEventListener('click', () => {
-        try { localStorage.removeItem(LEVEL_STORAGE_KEY); } catch { /* localStorage unavailable */ }
-        resetGame();
-    });
+    document.getElementById('btnVolverJugar')!.addEventListener('click', handleReplay);
+    document.getElementById('btnVolverJugar2')!.addEventListener('click', handleReplay);
 </script>
