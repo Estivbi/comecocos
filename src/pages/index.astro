@@ -612,17 +612,26 @@
     }
 
     document.getElementById('btnIrEntradas')!.addEventListener('click', () => {
-        document.getElementById('giftReveal')!.style.display = 'none';
-        document.getElementById('mockAppSection')!.style.display = 'block';
+        const giftReveal = document.getElementById('giftReveal')!;
+        const mockAppSection = document.getElementById('mockAppSection')!;
+        const btnRevealQR = document.getElementById('btnRevealQR') as HTMLButtonElement | null;
+
+        giftReveal.style.display = 'none';
+        mockAppSection.style.display = 'block';
+
+        btnRevealQR?.focus();
     });
 
     // Revelar QR y mapa
     document.getElementById('btnRevealQR')!.addEventListener('click', () => {
         const btn = document.getElementById('btnRevealQR')!;
-        const tickets = document.getElementById('hiddenTickets')!;
+        const tickets = document.getElementById('hiddenTickets')! as HTMLElement;
         tickets.removeAttribute('hidden');
         btn.setAttribute('aria-expanded', 'true');
-        btn.style.display = 'none';
+        if (!tickets.hasAttribute('tabindex')) {
+            tickets.setAttribute('tabindex', '-1');
+        }
+        tickets.focus();
     });
 
     window.addEventListener('keydown', (e: KeyboardEvent) => {
