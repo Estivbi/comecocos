@@ -197,6 +197,9 @@
     const canvas = document.getElementById('pacmanCanvas') as HTMLCanvasElement;
     const ctx = canvas.getContext('2d')!;
     const TILE_SIZE = 30;
+    const PACMAN_MOVE_INTERVAL = 5;
+    const GHOST_SPEED_RATIO = 1.5;
+    const GHOST_MOVE_INTERVAL = Math.round(PACMAN_MOVE_INTERVAL * GHOST_SPEED_RATIO);
 
     // 1 = Pared, 0 = Punto, 2 = Vacío
     const map = [
@@ -299,7 +302,7 @@
         frameCount++;
 
         // Mover Pacman
-        if (frameCount % 5 === 0) {
+        if (frameCount % PACMAN_MOVE_INTERVAL === 0) {
             if (map[pacman.r + pacman.nextDr][pacman.c + pacman.nextDc] !== 1) {
                 pacman.dr = pacman.nextDr; pacman.dc = pacman.nextDc;
             }
@@ -318,7 +321,7 @@
         }
 
         // Mover Fantasmas (IA Básica Aleatoria)
-        if (frameCount % 8 === 0) {
+        if (frameCount % GHOST_MOVE_INTERVAL === 0) {
             ghosts.forEach(g => {
                 let moves = [
                     {r: -1, c: 0}, {r: 1, c: 0}, {r: 0, c: -1}, {r: 0, c: 1}
