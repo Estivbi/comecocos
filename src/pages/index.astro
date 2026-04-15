@@ -36,6 +36,7 @@
         <p>Has superado la fase de los 30 con éxito.</p>
         <p>Prepara una <span class="highlight">cerveza fría</span>, ponte tu <span class="highlight">camiseta favorita</span> y ¡nos vamos!</p>
         <button id="btnIrEntradas">🎟️ ENTRADAS PARA EL TEATRO 🎟️</button>
+        <button id="btnVolverJugar" class="btn-replay">🎮 Volver a jugar</button>
     </div>
 
     <div id="mockAppSection">
@@ -79,6 +80,7 @@
                     </div>
                 </div>
             </div>
+            <button id="btnVolverJugar2" class="btn-replay btn-replay-app">🎮 Volver a jugar</button>
         </div>
     </div>
 
@@ -446,18 +448,43 @@
         color: #e94560;
         font-weight: bold;
     }
+
+    /* BOTÓN VOLVER A JUGAR */
+    .btn-replay {
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        color: #ffde00;
+        padding: 12px 24px;
+        border: 2px solid #ffde00;
+        border-radius: 10px;
+        margin-top: 16px;
+        font-size: 0.9rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        font-family: 'Poppins', sans-serif;
+    }
+    .btn-replay:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(255, 222, 0, 0.3);
+    }
+    .btn-replay-app {
+        display: block;
+        width: calc(100% - 40px);
+        margin: 20px 20px;
+    }
 </style>
 
 <script>
     const canvas = document.getElementById('pacmanCanvas') as HTMLCanvasElement;
     const ctx = canvas.getContext('2d')!;
     const TILE_SIZE = 30;
-    const PACMAN_MOVE_INTERVAL = 5;
+    const PACMAN_MOVE_INTERVAL = 8;
     const GHOST_SPEED_RATIO = 1.5;
     const GHOST_MOVE_INTERVAL = Math.round(PACMAN_MOVE_INTERVAL * GHOST_SPEED_RATIO);
+    const LEVEL_STORAGE_KEY = 'comecocos_level_beaten';
 
     // 1 = Pared, 0 = Punto, 2 = Vacío
-    const map = [
+    const INITIAL_MAP = [
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
         [1,0,0,0,0,0,1,0,0,0,0,0,0,0,1],
         [1,0,1,1,1,0,1,0,1,1,1,1,1,0,1],
@@ -471,12 +498,19 @@
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
     ];
 
-    let totalDots = 0;
-    for(let r=0; r<map.length; r++) {
-        for(let c=0; c<map[r].length; c++) {
-            if(map[r][c] === 0) totalDots++;
+    let map = INITIAL_MAP.map(row => [...row]);
+
+    function countDots(): number {
+        let dots = 0;
+        for(let r=0; r<map.length; r++) {
+            for(let c=0; c<map[r].length; c++) {
+                if(map[r][c] === 0) dots++;
+            }
         }
+        return dots;
     }
+
+    let totalDots = countDots();
 
     let pacman = { r: 1, c: 1, nextDr: 0, nextDc: 0, dr: 0, dc: 0 };
 
@@ -486,6 +520,21 @@
     ];
 
     let frameCount = 0;
+    let gameRunning = false;
+
+    // Comprobar si el nivel ya fue superado
+    try {
+        if (localStorage.getItem(LEVEL_STORAGE_KEY) === 'true') {
+            document.getElementById('gameSection')!.style.display = 'none';
+            document.getElementById('giftReveal')!.style.display = 'block';
+        } else {
+            gameRunning = true;
+            requestAnimationFrame(update);
+        }
+    } catch {
+        gameRunning = true;
+        requestAnimationFrame(update);
+    }
 
     function drawMap() {
         ctx.fillStyle = '#000';
@@ -603,12 +652,54 @@
         drawMap();
         drawPacman();
         drawGhosts();
-        requestAnimationFrame(update);
+        if (gameRunning) {
+            requestAnimationFrame(update);
+        }
     }
 
     function winGame() {
+        gameRunning = false;
+        try { localStorage.setItem(LEVEL_STORAGE_KEY, 'true'); } catch { /* localStorage unavailable */ }
         document.getElementById('gameSection')!.style.display = 'none';
         document.getElementById('giftReveal')!.style.display = 'block';
+    }
+
+    function resetGame() {
+        // Restaurar mapa
+        map = INITIAL_MAP.map(row => [...row]);
+        totalDots = countDots();
+        // Restaurar posiciones
+        pacman = { r: 1, c: 1, nextDr: 0, nextDc: 0, dr: 0, dc: 0 };
+        ghosts = [
+            { r: 5, c: 7, color: '#FF0000' },
+            { r: 5, c: 8, color: '#FFB8FF' }
+        ];
+        frameCount = 0;
+
+        // Mostrar sección de juego
+        document.getElementById('gameSection')!.style.display = '';
+        document.getElementById('giftReveal')!.style.display = 'none';
+        document.getElementById('mockAppSection')!.style.display = 'none';
+        document.getElementById('warning')!.innerText = '';
+
+        // Restaurar estado interno de la UI de entradas
+        const hiddenTickets = document.getElementById('hiddenTickets');
+        const btnRevealQR = document.getElementById('btnRevealQR') as HTMLButtonElement | null;
+
+        if (hiddenTickets) {
+            hiddenTickets.hidden = true;
+            hiddenTickets.querySelectorAll('[tabindex]').forEach((element) => {
+                element.removeAttribute('tabindex');
+            });
+        }
+
+        btnRevealQR?.setAttribute('aria-expanded', 'false');
+
+        // Reiniciar bucle si no estaba corriendo
+        if (!gameRunning) {
+            gameRunning = true;
+            requestAnimationFrame(update);
+        }
     }
 
     document.getElementById('btnIrEntradas')!.addEventListener('click', () => {
@@ -684,5 +775,12 @@
         });
     });
 
-    requestAnimationFrame(update);
+    // Botones "Volver a jugar"
+    function handleReplay() {
+        try { localStorage.removeItem(LEVEL_STORAGE_KEY); } catch { /* localStorage unavailable */ }
+        resetGame();
+    }
+
+    document.getElementById('btnVolverJugar')!.addEventListener('click', handleReplay);
+    document.getElementById('btnVolverJugar2')!.addEventListener('click', handleReplay);
 </script>
