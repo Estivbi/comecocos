@@ -34,7 +34,7 @@
     <div id="giftReveal">
         <h2>¡LEVEL UP!<br />BIENVENIDO AL NIVEL 31</h2>
         <p>Has superado la fase de los 30 con éxito.</p>
-        <p>Prepara una <span class="highlight">cerveza fría</span>, ponte tu chupa de <span class="highlight">rock</span> y olvídate de los planos de caminos por hoy.</p>
+        <p>Prepara una <span class="highlight">cerveza fría</span>, ponte tu <span class="highlight">camiseta favorita</span> y ¡nos vamos!</p>
         <div style="background: #222; padding: 20px; border-radius: 10px; margin-top: 20px; border: 1px dashed #555;">
             <h3 style="color: #fff; margin:0 0 10px 0; font-size: 1.2rem;">🎟️ ENTRADAS PARA EL MONÓLOGO 🎟️</h3>
             <p style="font-size: 1rem; margin:0;">Nos vamos a partir de risa.</p>
@@ -299,7 +299,7 @@
         frameCount++;
 
         // Mover Pacman
-        if (frameCount % 8 === 0) {
+        if (frameCount % 5 === 0) {
             if (map[pacman.r + pacman.nextDr][pacman.c + pacman.nextDc] !== 1) {
                 pacman.dr = pacman.nextDr; pacman.dc = pacman.nextDc;
             }
@@ -318,7 +318,7 @@
         }
 
         // Mover Fantasmas (IA Básica Aleatoria)
-        if (frameCount % 12 === 0) {
+        if (frameCount % 8 === 0) {
             ghosts.forEach(g => {
                 let moves = [
                     {r: -1, c: 0}, {r: 1, c: 0}, {r: 0, c: -1}, {r: 0, c: 1}
