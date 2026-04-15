@@ -34,10 +34,48 @@
     <div id="giftReveal">
         <h2>¡LEVEL UP!<br />BIENVENIDO AL NIVEL 31</h2>
         <p>Has superado la fase de los 30 con éxito.</p>
-        <p>Prepara una <span class="highlight">cerveza fría</span>, ponte tu chupa de <span class="highlight">rock</span> y olvídate de los planos de caminos por hoy.</p>
-        <div style="background: #222; padding: 20px; border-radius: 10px; margin-top: 20px; border: 1px dashed #555;">
-            <h3 style="color: #fff; margin:0 0 10px 0; font-size: 1.2rem;">🎟️ ENTRADAS PARA EL MONÓLOGO 🎟️</h3>
-            <p style="font-size: 1rem; margin:0;">Nos vamos a partir de risa.</p>
+        <p>Prepara una <span class="highlight">cerveza fría</span>, ponte tu <span class="highlight">camiseta favorita</span> y nos vamos!</p>
+        <div id="btnIrEntradas">🎟️ ENTRADAS PARA EL TEATRO 🎟️</div>
+    </div>
+
+    <div id="mockAppSection">
+        <div class="app-header">entradas.com</div>
+        <div class="app-content">
+            <img class="app-cover" src="https://placehold.co/600x300/1a1a2e/e94560?text=Mon%C3%B3logo+en+Vivo" alt="Cover del monólogo" />
+            <h2 class="app-title">Gran Monólogo en Vivo</h2>
+            <div class="app-details">
+                <div class="app-detail-row"><span class="detail-label">📅 Fecha</span><span class="detail-value">Sábado 20 de Mayo, 21:00h</span></div>
+                <div class="app-detail-row"><span class="detail-label">🏛️ Teatro</span><span class="detail-value">Teatro Principal</span></div>
+                <div class="app-detail-row"><span class="detail-label">💺 Fila</span><span class="detail-value">7</span></div>
+                <div class="app-detail-row"><span class="detail-label">🎫 Butaca</span><span class="detail-value">14 y 15</span></div>
+            </div>
+            <button id="btnRevealQR">Ver Entradas y Mapa</button>
+            <div id="hiddenTickets">
+                <div class="ticket-qr">
+                    <div class="qr-placeholder">
+                        <div class="qr-grid"></div>
+                        <p class="qr-label">Código QR de entrada</p>
+                    </div>
+                </div>
+                <div class="ticket-map">
+                    <div class="map-placeholder">
+                        <p class="map-label">🗺️ Mapa del Recinto</p>
+                        <div class="map-grid">
+                            <div class="stage">ESCENARIO</div>
+                            <div class="seats-area">
+                                <div class="seat-row">○ ○ ○ ○ ○ ○ ○ ○</div>
+                                <div class="seat-row">○ ○ ○ ○ ○ ○ ○ ○</div>
+                                <div class="seat-row">○ ○ ○ ○ ○ ○ ○ ○</div>
+                                <div class="seat-row">○ ○ ○ ○ ○ ○ ○ ○</div>
+                                <div class="seat-row">○ ○ ○ ○ ○ ○ ○ ○</div>
+                                <div class="seat-row">○ ○ ○ ○ ○ ○ ○ ○</div>
+                                <div class="seat-row highlight-row">○ ○ ○ ○ ○ ● ● ○</div>
+                                <div class="seat-row">○ ○ ○ ○ ○ ○ ○ ○</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -190,6 +228,201 @@
         font-size: 0.8rem;
         margin-top: 10px;
         min-height: 1em;
+    }
+
+    /* BOTÓN IR A ENTRADAS */
+    #btnIrEntradas {
+        background: linear-gradient(135deg, #e94560, #c23152);
+        color: #fff;
+        padding: 18px 30px;
+        border-radius: 12px;
+        margin-top: 24px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
+        font-family: 'Poppins', sans-serif;
+    }
+    #btnIrEntradas:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(233, 69, 96, 0.6);
+    }
+
+    /* MOCK APP SECTION */
+    #mockAppSection {
+        display: none;
+        width: 100%;
+        max-width: 420px;
+        min-height: 100vh;
+        background: #0f0f1a;
+        font-family: 'Poppins', sans-serif;
+        color: #e0e0e0;
+        animation: slideUp 0.5s ease forwards;
+    }
+
+    @keyframes slideUp {
+        0% { opacity: 0; transform: translateY(40px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .app-header {
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        padding: 16px 20px;
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #e94560;
+        text-align: center;
+        letter-spacing: 2px;
+        border-bottom: 1px solid #2a2a4a;
+    }
+
+    .app-content {
+        padding: 0;
+    }
+
+    .app-cover {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .app-title {
+        font-size: 1.4rem;
+        color: #fff;
+        margin: 20px 20px 10px;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .app-details {
+        padding: 0 20px;
+        margin-bottom: 20px;
+    }
+
+    .app-detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #1a1a2e;
+        font-size: 0.9rem;
+    }
+
+    .detail-label {
+        color: #888;
+    }
+
+    .detail-value {
+        color: #fff;
+        font-weight: 600;
+    }
+
+    #btnRevealQR {
+        display: block;
+        width: calc(100% - 40px);
+        margin: 10px 20px 20px;
+        padding: 14px;
+        background: linear-gradient(135deg, #e94560, #c23152);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        font-family: 'Poppins', sans-serif;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 12px rgba(233, 69, 96, 0.3);
+    }
+
+    #btnRevealQR:hover {
+        transform: scale(1.03);
+        box-shadow: 0 6px 18px rgba(233, 69, 96, 0.5);
+    }
+
+    #hiddenTickets {
+        display: none;
+        padding: 20px;
+        animation: fadeIn 0.5s ease forwards;
+    }
+
+    @keyframes fadeIn {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+
+    .ticket-qr {
+        margin-bottom: 20px;
+    }
+
+    .qr-placeholder {
+        background: #fff;
+        border-radius: 12px;
+        padding: 24px;
+        text-align: center;
+    }
+
+    .qr-grid {
+        width: 160px;
+        height: 160px;
+        margin: 0 auto 12px;
+        background:
+            repeating-conic-gradient(#000 0% 25%, #fff 0% 50%) 0 0 / 16px 16px;
+        border: 3px solid #000;
+        border-radius: 4px;
+    }
+
+    .qr-label {
+        color: #333;
+        font-size: 0.85rem;
+        margin: 0;
+    }
+
+    .ticket-map {
+        margin-bottom: 20px;
+    }
+
+    .map-placeholder {
+        background: #1a1a2e;
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid #2a2a4a;
+    }
+
+    .map-label {
+        text-align: center;
+        font-size: 1rem;
+        margin: 0 0 14px;
+        color: #ccc;
+    }
+
+    .map-grid {
+        text-align: center;
+    }
+
+    .stage {
+        background: linear-gradient(135deg, #e94560, #c23152);
+        color: #fff;
+        padding: 8px;
+        border-radius: 6px 6px 0 0;
+        font-size: 0.8rem;
+        font-weight: bold;
+        letter-spacing: 2px;
+        margin-bottom: 10px;
+    }
+
+    .seats-area {
+        font-size: 0.75rem;
+        line-height: 1.8;
+        color: #555;
+    }
+
+    .seat-row {
+        letter-spacing: 4px;
+    }
+
+    .highlight-row {
+        color: #e94560;
+        font-weight: bold;
     }
 </style>
 
@@ -352,6 +585,18 @@
         document.getElementById('gameSection')!.style.display = 'none';
         document.getElementById('giftReveal')!.style.display = 'block';
     }
+
+    // Navegación a la app de entradas
+    document.getElementById('btnIrEntradas')!.addEventListener('click', () => {
+        document.getElementById('giftReveal')!.style.display = 'none';
+        document.getElementById('mockAppSection')!.style.display = 'block';
+    });
+
+    // Revelar QR y mapa
+    document.getElementById('btnRevealQR')!.addEventListener('click', () => {
+        document.getElementById('hiddenTickets')!.style.display = 'block';
+        (document.getElementById('btnRevealQR') as HTMLButtonElement).style.display = 'none';
+    });
 
     window.addEventListener('keydown', (e: KeyboardEvent) => {
         if(e.key === 'ArrowUp') { pacman.nextDr = -1; pacman.nextDc = 0; }
